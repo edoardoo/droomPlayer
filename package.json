@@ -1,0 +1,18 @@
+{
+  "name": "droom-player",
+  "version": "1.0.0",
+  "description": "Droom player.",
+  "main": "js/droomPlayer.js",
+  "scripts": {
+    "start": "gulp serve",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "browser-sync": "^2.18.6",
+    "gulp": "^3.9.1",
+    "gulp-sass": "^3.1.0",
+    "normalize.css": "^5.0.0"
+  }
+}
