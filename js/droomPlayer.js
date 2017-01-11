@@ -8,7 +8,6 @@ class ShortKey {
         this.reaction = reaction;
         this.description = description;
         this.setListeners();
-        this.sk = this;
     }
 
     getKeyId(){
@@ -24,10 +23,14 @@ class ShortKey {
     }
 
     setListeners(){
+
         if( Array.isArray(this.reaction) ){
+
             this.keyUp = this.reaction[1];
             this.keyDown = this.reaction[0];
+
         }else if( this.action == 'down' ){
+
             this.keyUp = ()=>{};
             this.keyDown = this.reaction;
 
