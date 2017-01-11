@@ -44,6 +44,8 @@ class ShortKey {
 }
 
 let playerManager = function( video ){
+    logger.debug("droomPlayer", 'Starting up...');
+
     let pm = this;
     pm.player = video;
 
@@ -88,10 +90,17 @@ let playerManager = function( video ){
 
     pm.prepareMappedKeysObject = ()=>{
         pm.shortKeys.map(function( element ){
-            var id =  element.keyId;
 
+            let id =  element.keyId;
             pm.mappedShortKeys[id] = element;
+
         });
+    }
+
+    pm.mappedShortKeys = {
+        32: new ShortKey( 32, '[space]', 'playOnPress' , 'hold', [pm.play, pm.pause] ),
+        80: new ShortKey( 80, 'p', 'playToggle'  , 'down', pm.toggle )
+
     }
 
     pm.setListeners = ()=>{
@@ -101,7 +110,7 @@ let playerManager = function( video ){
         window.onkeydown = (e)=>{
 
             let key = e.keyCode ? e.keyCode : e.which;
-            console.log("down "+key);
+            logger.debug("Listeners", 'Received on key down: ', e.keyCode);
             let shortKey = pm.mappedShortKeys[key];
             if( typeof(shortKey) !== 'undefined'){
 
@@ -113,7 +122,7 @@ let playerManager = function( video ){
         window.onkeyup = (e)=>{
 
             let key = e.keyCode ? e.keyCode : e.which;
-            console.log(e);
+            logger.debug("Listeners", 'Received on key up: ', e.keyCode);
             let shortKey = pm.mappedShortKeys[key];
             if( typeof(shortKey) !== 'undefined'){
 
