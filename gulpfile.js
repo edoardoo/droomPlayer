@@ -11,8 +11,8 @@ gulp.task('serve', ['sass'], function() {
     });
 
     gulp.watch("**/scss/*.scss", ['sass']);
-    gulp.watch("**/*.html").on('change', browserSync.reload);
-    gulp.watch("**/*.js").on('change', browserSync.reload);
+    // gulp.watch("**/*.html").on('change', browserSync.reload);
+    gulp.watch(["player.html","js/**/*.js"]).on('change', browserSync.reload);
 });
 
 // Compile sass into CSS & auto-inject into browsers
@@ -22,5 +22,13 @@ gulp.task('sass', function() {
         .pipe(gulp.dest("styles/css"))
         .pipe(browserSync.stream());
 });
+
+// gulp.task('jasmine', function() {
+//   var filesForTest = ['js/**/*.js', 'test/spec/**/*.js']
+//   return gulp.src(filesForTest)
+//     .pipe(watch(filesForTest))
+//     .pipe(jasmineBrowser.specRunner())
+//     .pipe(jasmineBrowser.server({port: 8888}));
+// });
 
 gulp.task('default', ['serve']);

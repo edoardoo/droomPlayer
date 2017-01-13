@@ -1,5 +1,3 @@
-let video = document.getElementById('videoPlayer');
-
 class ShortKey {
 
     constructor( keyId, keyPressed, description, action, reaction){
@@ -137,4 +135,46 @@ let playerManager = function( video ){
     return pm;
 }
 
-video = playerManager( video );
+
+
+// var spaceCircles = [30, 70, 110];
+// var outerWidth  = 300;
+// var outerHeight = 250;
+//
+// var margin = { left: 30, top: 30, right: 30, bottom: 30 };
+//
+// var innerWidth  = outerWidth  - margin.left - margin.right;
+// var innerHeight = outerHeight - margin.top  - margin.bottom;
+//
+//
+// var svg = d3.select("#seeker").append("svg")
+// .attr("width",  outerWidth)
+// .attr("height", outerHeight);
+//
+// var g = svg.append("g")
+// .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+//
+// var xScale = d3.scale.linear().range([0, innerWidth]);
+// var yScale = d3.scale.linear().range([innerHeight, 0]);
+//
+// function render(data){
+//
+// xScale.domain( d3.extent(data, function (d){ return d[xColumn]; }));
+// yScale.domain( d3.extent(data, function (d){ return d[yColumn]; }));
+//
+// var circles = g.selectAll("circle").data(data);
+// circles.enter().append("circle");
+// circles
+//  .attr("cx", function (d){ return xScale(d[xColumn]); })
+//  .attr("cy", function (d){ return yScale(d[yColumn]); })
+//  .attr("r",  function (d){ return rScale(d[rColumn]); });
+// circles.exit().remove();
+// }
+//
+// function type(d){
+// d.population = +d.population;
+// d.gdp        = +d.gdp;
+// return d;
+// }
+//
+// d3.csv("countries_population_GDP.csv", type, render);
