@@ -2,7 +2,6 @@
 describe("Player", function() {
     var player;
 
-
     function prepareVideo(){
         var video = document.createElement('video');
         video.src = 'videoExample/SampleVideo_1280x720_2mb.mp4';
@@ -42,6 +41,36 @@ describe("Player", function() {
             expect( player.isPlaying() ).toEqual(false);
 
         });
+
+        player.shortKeys.each( function (shortKey) {
+            it("should be able to " + shortkey.getDescription(), function(){
+
+            })
+        });
+
+        function generateKeyEvent(shortKey){
+            let keyboardEvent = document.createEvent("KeyboardEvent");
+            let initMethod = typeof keyboardEvent.initKeyboardEvent !== 'undefined' ? "initKeyboardEvent" : "initKeyEvent";
+
+            let keyActions = {
+                "down": "keydown",
+                "up": "keyup"
+            };
+
+            keyboardEvent[initMethod](
+                               "keydown", // event type : keydown, keyup, keypress
+                                true, // bubbles
+                                true, // cancelable
+                                window, // viewArg: should be window
+                                false, // ctrlKeyArg
+                                false, // altKeyArg
+                                false, // shiftKeyArg
+                                false, // metaKeyArg
+                                shortKey.getKeyId(), // keyCodeArg : unsigned long the virtual key code, else 0
+                                0 // charCodeArgs : unsigned long the Unicode character associated with the depressed key, else 0
+            );
+            document.dispatchEvent(keyboardEvent);
+        }
     });
 
 

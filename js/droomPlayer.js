@@ -20,6 +20,10 @@ class ShortKey {
         return this.reaction;
     }
 
+    getDescription(){
+        return this.description;
+    }
+
     setListeners(){
 
         if( Array.isArray(this.reaction) ){
