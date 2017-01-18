@@ -42,10 +42,8 @@ describe("Player", function() {
 
         });
 
-        player.shortKeys.each( function (shortKey) {
-            it("should be able to " + shortkey.getDescription(), function(){
+        it("should be able to ", function(){
 
-            })
         });
 
         function generateKeyEvent(shortKey){

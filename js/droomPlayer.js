@@ -45,6 +45,70 @@ class ShortKey {
 
 }
 
+
+
+
+let seeker  = function(){
+    let sk = this;
+    sk.videoLength = 100;
+    sk.seconds = 0;
+    sk.width = 400;
+    let seeker = document.getElementById("seeker");
+    seekerWidth = seeker.width;
+
+    sk.linearScale = d3.scaleLinear()
+                      .domain([0, sk.videoLength])
+                      .range([0,seekerWidth]);
+
+    sk.svgContainer = d3.select("#seeker").append("svg")
+                      .attr("width", "100%")
+                      .attr("height", 50)
+                      .attr("style", "background-color: #999;");
+
+
+    sk.rectangle = svgContainer.append("rect")
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .attr("width", linearScale(sk.seconds))
+                    .attr("height", 50)
+                    .attr("style", "fill: black;");
+
+
+    sk.svg = d3.select("svg"),
+          width = +svg.attr("width"),
+          height = +svg.attr("height"),
+          g = svg.append("g");
+
+    sk.update = function() {
+
+          rectangle.attr( "width", linearScale( sk.seconds ) );
+
+          if ( sk.refresh ) {
+
+              window.requestAnimationFrame(sk.update);
+
+          }
+
+    }
+
+    sk.startRefresh = function(){
+
+        sk.refresh = true;
+        update();
+    }
+
+    sk.stopRefresh  = function () {
+
+        sk.refresh = false;
+
+    }
+
+    window.requestAnimationFrame( sk.update );
+    return sk;
+}
+
+
+
 let playerManager = function( video ){
     logger.debug("droomPlayer", 'Starting up...');
 
@@ -54,16 +118,29 @@ let playerManager = function( video ){
     pm.setPlayer = function ( player ) {
 
         pm.player = player;
-
     };
+
+    pm.initSeeker =function () {
+
+        pm.seekerVideo = seeker();
+        pm.seekerVideo.videoLength = pm.player.duration;
+
+    }
 
     pm.play = ()=>{
 
+        pm.seekerVideo.startRefresh();
+        logger.debug("PlayerManager", "old current time", pm.seekerVideo.seconds);
+        pm.seekerVideo.seconds = pm.player.currentTime;
+        logger.debug("PlayerManager", "new current time", pm.seekerVideo.seconds);
+
         return pm.player.play();
+
     };
 
     pm.pause = ()=>{
 
+        pm.seekerVideo.stopRefresh();
         return pm.player.pause();
     };
 
@@ -99,11 +176,6 @@ let playerManager = function( video ){
         });
     }
 
-    pm.mappedShortKeys = {
-        32: new ShortKey( 32, '[space]', 'playOnPress' , 'hold', [pm.play, pm.pause] ),
-        80: new ShortKey( 80, 'p', 'playToggle'  , 'down', pm.toggle )
-
-    }
 
     pm.setListeners = ()=>{
 
@@ -112,7 +184,8 @@ let playerManager = function( video ){
         window.onkeydown = (e)=>{
 
             let key = e.keyCode ? e.keyCode : e.which;
-            logger.debug("Listeners", 'Received on key down: ', e.keyCode);
+            e.preventDefault();
+            //logger.debug("Listeners", 'Received on key down: ', e.keyCode);
             let shortKey = pm.mappedShortKeys[key];
             if( typeof(shortKey) !== 'undefined'){
 
@@ -124,7 +197,8 @@ let playerManager = function( video ){
         window.onkeyup = (e)=>{
 
             let key = e.keyCode ? e.keyCode : e.which;
-            logger.debug("Listeners", 'Received on key up: ', e.keyCode);
+            e.preventDefault();
+            //logger.debug("Listeners", 'Received on key up: ', e.keyCode);
             let shortKey = pm.mappedShortKeys[key];
             if( typeof(shortKey) !== 'undefined'){
 
@@ -134,51 +208,8 @@ let playerManager = function( video ){
 
     }
     pm.setListeners();
+    pm.initSeeker();
 
 
     return pm;
 }
-
-
-
-// var spaceCircles = [30, 70, 110];
-// var outerWidth  = 300;
-// var outerHeight = 250;
-//
-// var margin = { left: 30, top: 30, right: 30, bottom: 30 };
-//
-// var innerWidth  = outerWidth  - margin.left - margin.right;
-// var innerHeight = outerHeight - margin.top  - margin.bottom;
-//
-//
-// var svg = d3.select("#seeker").append("svg")
-// .attr("width",  outerWidth)
-// .attr("height", outerHeight);
-//
-// var g = svg.append("g")
-// .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-//
-// var xScale = d3.scale.linear().range([0, innerWidth]);
-// var yScale = d3.scale.linear().range([innerHeight, 0]);
-//
-// function render(data){
-//
-// xScale.domain( d3.extent(data, function (d){ return d[xColumn]; }));
-// yScale.domain( d3.extent(data, function (d){ return d[yColumn]; }));
-//
-// var circles = g.selectAll("circle").data(data);
-// circles.enter().append("circle");
-// circles
-//  .attr("cx", function (d){ return xScale(d[xColumn]); })
-//  .attr("cy", function (d){ return yScale(d[yColumn]); })
-//  .attr("r",  function (d){ return rScale(d[rColumn]); });
-// circles.exit().remove();
-// }
-//
-// function type(d){
-// d.population = +d.population;
-// d.gdp        = +d.gdp;
-// return d;
-// }
-//
-// d3.csv("countries_population_GDP.csv", type, render);

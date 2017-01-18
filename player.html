@@ -28,9 +28,11 @@
         <script type="text/javascript" src="js/logger.js"></script>
         <script type="text/javascript" src="js/droomPlayer.js"></script>
         <script type="text/javascript">
-            let video = document.getElementById('videoPlayer');
-            var droomPlayer = playerManager( video );
-
+            var droomPlayer;
+            window.onload = function(){
+                let video = document.getElementById('videoPlayer');
+                droomPlayer = playerManager( video );
+            }
         </script>
     </body>
 
