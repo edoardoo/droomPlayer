@@ -53,57 +53,87 @@ let seeker  = function(){
     sk.videoLength = 100;
     sk.seconds = 0;
     sk.width = 400;
-    let seeker = document.getElementById("seeker");
-    seekerWidth = seeker.width;
 
-    sk.linearScale = d3.scaleLinear()
-                      .domain([0, sk.videoLength])
-                      .range([0,seekerWidth]);
+    // logger.debug('Seeker', ' video length:', sk.videoLength);
+    // logger.debug('Seeker', ' seeker width:', sk.seekerWidth);
 
-    sk.svgContainer = d3.select("#seeker").append("svg")
-                      .attr("width", "100%")
-                      .attr("height", 50)
-                      .attr("style", "background-color: #999;");
+    sk.init = ()=> {
 
+        sk.seekerWidth = document.getElementById("seeker").offsetWidth;
 
-    sk.rectangle = svgContainer.append("rect")
-                    .attr("x", 0)
-                    .attr("y", 0)
-                    .attr("width", linearScale(sk.seconds))
-                    .attr("height", 50)
-                    .attr("style", "fill: black;");
-
-
-    sk.svg = d3.select("svg"),
-          width = +svg.attr("width"),
-          height = +svg.attr("height"),
-          g = svg.append("g");
-
-    sk.update = function() {
-
-          rectangle.attr( "width", linearScale( sk.seconds ) );
-
-          if ( sk.refresh ) {
-
-              window.requestAnimationFrame(sk.update);
-
-          }
+        sk.createSvg();
+        sk.updateLinearScale();
+        sk.createSeekerRectangle();
 
     }
 
-    sk.startRefresh = function(){
+    sk.createSvg = ()=> {
+
+        sk.svgContainer = d3.select("#seeker").append("svg")
+        .attr("width", "100%")
+        .attr("height", 50)
+        .attr("style", "background-color: #999;");
+
+        sk.svg = d3.select("svg"),
+        width = +svg.attr("width"),
+        height = +svg.attr("height"),
+        g = svg.append("g");
+
+    }
+
+    sk.createSeekerRectangle = ()=> {
+
+        sk.rectangle = svgContainer.append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", sk.linearScale(sk.seconds))
+        .attr("height", 50)
+        .attr("style", "fill: black;");
+
+    }
+
+    sk.updateLength = ( length )=> {
+
+        sk.videoLength = length;
+        sk.updateLinearScale();
+
+    }
+
+    sk.updateLinearScale = ()=> {
+        sk.linearScale = d3.scaleLinear()
+        .domain([0, sk.videoLength])
+        .range([0, sk.seekerWidth]);
+    }
+
+    sk.update = ()=> {
+
+        // logger.debug('Seeker', ' new seconds: '+ sk.player.currentTime );
+
+        sk.rectangle.attr( "width", sk.linearScale( sk.player.currentTime ) );
+        // logger.debug('Seeker', ' new width: '+sk.linearScale( sk.seconds )+'/'+sk.seekerWidth);
+
+        if ( sk.refresh ) {
+
+            window.requestAnimationFrame(sk.update);
+
+        }
+
+    }
+
+    sk.startRefresh = ()=>{
 
         sk.refresh = true;
-        update();
+        window.requestAnimationFrame(sk.update);
     }
 
-    sk.stopRefresh  = function () {
+    sk.stopRefresh  = ()=> {
 
         sk.refresh = false;
 
     }
 
-    window.requestAnimationFrame( sk.update );
+    sk.init();
+
     return sk;
 }
 
@@ -114,26 +144,26 @@ let playerManager = function( video ){
 
     let pm = this;
     pm.player = video;
+    pm.mappedShortKeys = {};
 
-    pm.setPlayer = function ( player ) {
+    pm.init = ()=>{
+    
+        pm.initSeeker();
+        pm.setListeners();
 
-        pm.player = player;
-    };
+    }
 
-    pm.initSeeker =function () {
+    pm.initSeeker = ()=> {
 
         pm.seekerVideo = seeker();
-        pm.seekerVideo.videoLength = pm.player.duration;
+        pm.seekerVideo.player = pm.player;
+        pm.seekerVideo.updateLength( pm.player.duration );
 
     }
 
     pm.play = ()=>{
 
         pm.seekerVideo.startRefresh();
-        logger.debug("PlayerManager", "old current time", pm.seekerVideo.seconds);
-        pm.seekerVideo.seconds = pm.player.currentTime;
-        logger.debug("PlayerManager", "new current time", pm.seekerVideo.seconds);
-
         return pm.player.play();
 
     };
@@ -160,13 +190,6 @@ let playerManager = function( video ){
 
     };
 
-    pm.shortKeys = [
-        new ShortKey( 32, '[space]', 'playOnPress' , 'hold', [pm.play, pm.pause] ),
-        new ShortKey( 80, 'p', 'playToggle'  , 'down', pm.toggle )
-    ];
-
-    pm.mappedShortKeys = {};
-
     pm.prepareMappedKeysObject = ()=>{
         pm.shortKeys.map(function( element ){
 
@@ -175,7 +198,6 @@ let playerManager = function( video ){
 
         });
     }
-
 
     pm.setListeners = ()=>{
 
@@ -207,9 +229,14 @@ let playerManager = function( video ){
         }
 
     }
-    pm.setListeners();
-    pm.initSeeker();
 
+    pm.shortKeys = [
+        new ShortKey( 32, '[space]', 'playOnPress' , 'hold', [pm.play, pm.pause] ),
+        new ShortKey( 80, 'p', 'playToggle'  , 'down', pm.toggle )
+    ];
+
+
+    pm.init();
 
     return pm;
 }
