@@ -1,5 +1,7 @@
 
 describe("Player", function() {
+    var seeker;
+    var video;
     var player;
 
     function prepareVideo(){
@@ -9,11 +11,23 @@ describe("Player", function() {
         return video;
     }
 
+    function prepareSeeker(){
+        seeker = document.createElement('div');
+        seeker.id = "seeker";
+        seeker.style.width = "500px";
+    }
+
     describe("when player has loaded", function() {
 
         beforeEach(function() {
+            prepareSeeker();
             var video = prepareVideo();
             player = playerManager( video );
+        });
+
+        afterEach(function() {
+            seeker.parentNode.removeChild(seeker);
+            video.parentNode.removeChild(video);
         });
 
         it("should be able to play a Video", function() {
@@ -42,9 +56,13 @@ describe("Player", function() {
 
         });
 
-        it("should be able to ", function(){
+        it("should have a seeker", function() {
+
+            expect( player.seekerVideo ).toBeDefined();
 
         });
+
+
 
         function generateKeyEvent(shortKey){
             let keyboardEvent = document.createEvent("KeyboardEvent");

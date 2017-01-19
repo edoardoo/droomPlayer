@@ -59,12 +59,13 @@ let seeker  = function(){
 
     sk.init = ()=> {
 
-        sk.seekerWidth = document.getElementById("seeker").offsetWidth;
-
+        sk.seeker = document.getElementById("seeker");
+        sk.seekerWidth = sk.seeker.offsetWidth;
         sk.createSvg();
-        sk.updateLinearScale();
+        sk.updateTimeToPixelScale();
+        sk.updatePixelToTimeScale();
         sk.createSeekerRectangle();
-
+        sk.setSeekerListeners();
     }
 
     sk.createSvg = ()=> {
@@ -86,7 +87,7 @@ let seeker  = function(){
         sk.rectangle = svgContainer.append("rect")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("width", sk.linearScale(sk.seconds))
+        .attr("width", sk.timeToPixelScale(sk.seconds))
         .attr("height", 50)
         .attr("style", "fill: black;");
 
@@ -95,22 +96,26 @@ let seeker  = function(){
     sk.updateLength = ( length )=> {
 
         sk.videoLength = length;
-        sk.updateLinearScale();
+        sk.updateTimeToPixelScale();
+        sk.updatePixelToTimeScale();
 
     }
 
-    sk.updateLinearScale = ()=> {
-        sk.linearScale = d3.scaleLinear()
+    sk.updateTimeToPixelScale = ()=> {
+        sk.timeToPixelScale = d3.scaleLinear()
         .domain([0, sk.videoLength])
         .range([0, sk.seekerWidth]);
     }
 
+    sk.updatePixelToTimeScale = ()=> {
+        sk.pixelToTimeScale = d3.scaleLinear()
+        .domain([0, sk.seekerWidth])
+        .range([0, sk.videoLength]);
+    }
+
     sk.update = ()=> {
 
-        // logger.debug('Seeker', ' new seconds: '+ sk.player.currentTime );
-
-        sk.rectangle.attr( "width", sk.linearScale( sk.player.currentTime ) );
-        // logger.debug('Seeker', ' new width: '+sk.linearScale( sk.seconds )+'/'+sk.seekerWidth);
+        sk.rectangle.attr( "width", sk.timeToPixelScale( sk.player.currentTime ) );
 
         if ( sk.refresh ) {
 
@@ -122,14 +127,27 @@ let seeker  = function(){
 
     sk.startRefresh = ()=>{
 
+        logger.debug('Seeker', ' started refreshing seeker. ');
         sk.refresh = true;
         window.requestAnimationFrame(sk.update);
     }
 
     sk.stopRefresh  = ()=> {
 
+        logger.debug('Seeker', ' stopped refreshing seeker. ');
         sk.refresh = false;
 
+    }
+
+    sk.seekTo = (e)=>{
+
+        let timeInPixels = e.pageX - sk.seeker.offsetLeft;
+        console.log(sk.pixelToTimeScale( timeInPixels ));
+        sk.player.currentTime = sk.pixelToTimeScale( timeInPixels )
+    }
+
+    sk.setSeekerListeners = ()=>{
+        sk.seeker.addEventListener("mousedown", seekTo)
     }
 
     sk.init();
@@ -147,7 +165,7 @@ let playerManager = function( video ){
     pm.mappedShortKeys = {};
 
     pm.init = ()=>{
-    
+
         pm.initSeeker();
         pm.setListeners();
 
@@ -158,20 +176,37 @@ let playerManager = function( video ){
         pm.seekerVideo = seeker();
         pm.seekerVideo.player = pm.player;
         pm.seekerVideo.updateLength( pm.player.duration );
+        pm.player.addEventListener("timeupdate", function(){
+            if( ! pm.isPlaying() ){
+                pm.seekerVideo.update();
+            }
+        });
+
+    }
+
+    pm.loadVideo = ( url )=>{
+
+        pm.player.src = url;
+        pm.seekerVideo.updateLength( pm.player.duration );
 
     }
 
     pm.play = ()=>{
 
-        pm.seekerVideo.startRefresh();
-        return pm.player.play();
+        if ( !pm.isPlaying() ) {
+
+            pm.seekerVideo.startRefresh();
+            return pm.player.play();
+
+        }
 
     };
 
     pm.pause = ()=>{
-
-        pm.seekerVideo.stopRefresh();
-        return pm.player.pause();
+        if ( pm.isPlaying() ) {
+            pm.seekerVideo.stopRefresh();
+            return pm.player.pause();
+        }
     };
 
     pm.toggle = ()=>{
@@ -190,6 +225,15 @@ let playerManager = function( video ){
 
     };
 
+    pm.seekTo = ( time, isRelative )=>{
+
+        var newVideoTime = ( isRelative ) ? pm.player.currentTime + time : time;
+        newVideoTime = ( newVideoTime < 0 ) ? 0 : ( newVideoTime > pm.player.duration) ? pm.player.duration : newVideoTime;
+        pm.player.currentTime = newVideoTime;
+
+
+    }
+
     pm.prepareMappedKeysObject = ()=>{
         pm.shortKeys.map(function( element ){
 
@@ -207,7 +251,7 @@ let playerManager = function( video ){
 
             let key = e.keyCode ? e.keyCode : e.which;
             e.preventDefault();
-            //logger.debug("Listeners", 'Received on key down: ', e.keyCode);
+            logger.debug("Listeners", 'Received on key down: '+ e.keyCode);
             let shortKey = pm.mappedShortKeys[key];
             if( typeof(shortKey) !== 'undefined'){
 
@@ -220,7 +264,7 @@ let playerManager = function( video ){
 
             let key = e.keyCode ? e.keyCode : e.which;
             e.preventDefault();
-            //logger.debug("Listeners", 'Received on key up: ', e.keyCode);
+            logger.debug("Listeners", 'Received on key up: '+ e.keyCode);
             let shortKey = pm.mappedShortKeys[key];
             if( typeof(shortKey) !== 'undefined'){
 
