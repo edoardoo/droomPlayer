@@ -115,7 +115,7 @@ let seeker  = function(){
 
     sk.update = ()=> {
 
-        sk.rectangle.attr( "width", sk.timeToPixelScale( sk.player.currentTime ) );
+        sk.rectangle.attr( "width", sk.timeToPixelScale( sk.player.getCurrentTime() ) );
 
         if ( sk.refresh ) {
 
@@ -142,12 +142,15 @@ let seeker  = function(){
     sk.seekTo = (e)=>{
 
         let timeInPixels = e.pageX - sk.seeker.offsetLeft;
-        console.log(sk.pixelToTimeScale( timeInPixels ));
-        sk.player.currentTime = sk.pixelToTimeScale( timeInPixels )
+        sk.player.setCurrentTime( sk.pixelToTimeScale( timeInPixels ) );
+
     }
 
     sk.setSeekerListeners = ()=>{
-        sk.seeker.addEventListener("mousedown", seekTo)
+        sk.seeker.addEventListener("mousedown", sk.seekTo);
+        sk.seeker.addEventListener("mouseup", function(){
+
+        });
     }
 
     sk.init();
@@ -182,6 +185,14 @@ let playerManager = function( video ){
             }
         });
 
+    }
+
+    pm.player.setCurrentTime = ( time )=>{
+        pm.player.currentTime = time;
+    }
+
+    pm.player.getCurrentTime = ( )=>{
+        return pm.player.currentTime;
     }
 
     pm.loadVideo = ( url )=>{
@@ -225,7 +236,7 @@ let playerManager = function( video ){
 
     };
 
-    pm.seekTo = ( time, isRelative )=>{
+    pm.seekToTime = ( time, isRelative )=>{
 
         var newVideoTime = ( isRelative ) ? pm.player.currentTime + time : time;
         newVideoTime = ( newVideoTime < 0 ) ? 0 : ( newVideoTime > pm.player.duration) ? pm.player.duration : newVideoTime;
