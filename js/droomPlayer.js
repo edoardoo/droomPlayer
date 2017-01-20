@@ -1,3 +1,4 @@
+
 class ShortKey {
 
     constructor( keyId, keyPressed, description, action, reaction){
@@ -48,12 +49,12 @@ class ShortKey {
 
 
 
-let seeker  = function(){
+let seeker  = function( player ){
     let sk = this;
     sk.videoLength = 100;
     sk.seconds = 0;
     sk.width = 400;
-
+    sk.player = player;
     // logger.debug('Seeker', ' video length:', sk.videoLength);
     // logger.debug('Seeker', ' seeker width:', sk.seekerWidth);
 
@@ -62,6 +63,7 @@ let seeker  = function(){
         sk.seeker = document.getElementById("seeker");
         sk.seekerWidth = sk.seeker.offsetWidth;
         sk.createSvg();
+        sk.updateLength( sk.player.getDuration() );
         sk.updateTimeToPixelScale();
         sk.updatePixelToTimeScale();
         sk.createSeekerRectangle();
@@ -176,9 +178,8 @@ let playerManager = function( video ){
 
     pm.initSeeker = ()=> {
 
-        pm.seekerVideo = seeker();
-        pm.seekerVideo.player = pm.player;
-        pm.seekerVideo.updateLength( pm.player.duration );
+        pm.seekerVideo = seeker( pm.player );
+
         pm.player.addEventListener("timeupdate", function(){
             if( ! pm.isPlaying() ){
                 pm.seekerVideo.update();
@@ -193,6 +194,10 @@ let playerManager = function( video ){
 
     pm.player.getCurrentTime = ( )=>{
         return pm.player.currentTime;
+    }
+
+    pm.player.getDuration = ()=>{
+        return pm.player.duration;
     }
 
     pm.loadVideo = ( url )=>{
@@ -295,3 +300,5 @@ let playerManager = function( video ){
 
     return pm;
 }
+
+let testPlayer = new HtmlPlayerWrapper();
