@@ -1,4 +1,3 @@
-
 var playerManager = function( video ){
     logger.debug("droomPlayer", 'Starting up...');
 
@@ -14,16 +13,7 @@ var playerManager = function( video ){
     }
 
     pm.initSeeker = ()=>{
-
-        // console.dir(typeof(pm.player))
         pm.seekerVideo = new Seeker(  pm.player );
-        //
-        // pm.player.addEventListener("timeupdate", function(){
-        //     if( ! pm.isPlaying() ){
-        //         pm.seekerVideo.update();
-        //     }
-        // });
-
     }
 
     pm.setCurrentTime = ( time )=>{
@@ -128,9 +118,22 @@ var playerManager = function( video ){
 
     }
 
+    pm.startMarker = ()=>{
+
+        logger.debug("PlayerManager", "got this:", this.getKeyId());
+
+    }
+
+    pm.stopMarker = ()=>{
+
+
+
+    }
+
     pm.shortKeys = [
         new ShortKey( 32, '[space]', 'playOnPress' , 'hold', [pm.play, pm.pause] ),
-        new ShortKey( 80, 'p', 'playToggle'  , 'down', pm.toggle )
+        new ShortKey( 80, 'p', 'playToggle'  , 'down', pm.toggle ),
+        new ShortKey( 77, 'm', 'startMarker' , 'hold', [pm.startMarker, pm.stopMarker])
     ];
 
 

@@ -28,8 +28,8 @@ class ShortKey {
 
         if( Array.isArray(this.reaction) ){
 
-            this.keyUp = this.reaction[1];
-            this.keyDown = this.reaction[0];
+            this.keyUp = this.reaction[1].bind(this);
+            this.keyDown = this.reaction[0].bind(this);
 
         }else if( this.action == 'down' ){
 
