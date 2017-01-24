@@ -34,10 +34,10 @@ class ShortKey {
         }else if( this.action == 'down' ){
 
             this.keyUp = ()=>{};
-            this.keyDown = this.reaction;
+            this.keyDown = this.reaction.bind(this);
 
         }else{
-            this.keyUp = this.reaction;
+            this.keyUp = this.reaction.bind(this);
             this.keyDown = ()=>{};
 
         }

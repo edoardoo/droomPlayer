@@ -9,6 +9,7 @@ var playerManager = function( video ){
 
         pm.initSeeker();
         pm.setListeners();
+        pm.recordingMarker = false;
 
     }
 
@@ -118,15 +119,27 @@ var playerManager = function( video ){
 
     }
 
-    pm.startMarker = ()=>{
+    pm.markers = [];
+    pm.startMarker = function(){
+        if ( !pm.recordingMarker ) {
+            if ( !pm.player.isPlaying()) {
+                pm.play();
+            }
+            // logger.debug("PlayerManager", "got this:", this);
+            pm.currentMarker = pm.markers.push(new Marker(pm.player.currentTime));
+            pm.recordingMarker = true;
 
-        logger.debug("PlayerManager", "got this:", this.getKeyId());
+        }
 
     }
 
-    pm.stopMarker = ()=>{
+    pm.stopMarker = function(){
 
-
+        if ( pm.player.isPlaying()) {
+            pm.pause();
+        }
+        pm.recordingMarker = false;
+        pm.markers[ pm.currentMarker - 1 ].end = pm.player.currentTime;
 
     }
 
