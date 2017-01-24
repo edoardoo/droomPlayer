@@ -1,33 +1,33 @@
 class Marker{
-    
+
   constructor( startTime ){
-      this.start = startTime;
-      this.end = startTime;
-      this.label = "";
+      this._start = startTime;
+      this._end = startTime;
+      this._label = "";
   }
 
   set start( time ){
-    this.start = time;
+    this._start = time;
   }
 
   get start(){
-    return this.start;
+    return this._start;
   }
 
   set end( time ){
-    this.end = time;
+    this._end = time;
   }
 
   get end(){
-    return this.end;
+    return this._end;
   }
 
   set label( label ){
-    this.label = label;
+    this._label = label;
   }
 
   get label(){
-    return this.label;
+    return this._label;
   }
 
 
