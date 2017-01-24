@@ -13,7 +13,7 @@ class HtmlPlayerWrapper extends MediaWrapper{
         return this.player.currentTime;
     }
 
-    get length(){
+    get duration(){
         return this.player.duration;
     }
 
@@ -27,17 +27,17 @@ class HtmlPlayerWrapper extends MediaWrapper{
 
     set timeUpdateListener( callback ){
 
-        if( !isUndefined( this.timeUpdateListener ) ){
+        // if( !isUndefined( this.timeUpdateListenerInstance) ){
+        //
+        //     this.player.removeEventListener(this.timeUpdateListenerInstance );
+        //
+        // }
 
-            this.player.removeEventListener(this.timeUpdateListener);
-
-        }
-
-        this.timeUpdateListener = this.player.addEventListener("timeupdate", callback );
+        this.timeUpdateListenerInstance = this.player.addEventListener("timeupdate", callback );
     }
 
     get timeUpdateListener(){
-        return this.timeUpdateListener;
+        return this.timeUpdateListenerInstance;
     }
 
     play(){

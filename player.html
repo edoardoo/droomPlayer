@@ -28,12 +28,14 @@
         <script type="text/javascript" src="js/logger.js"></script>
         <script type="text/javascript" src="js/MediaWrapper.js"></script>
         <script type="text/javascript" src="js/HtmlPlayerWrapper.js"></script>
+        <script type="text/javascript" src="js/ShortKey.js"></script>
         <script type="text/javascript" src="js/droomPlayer.js"></script>
         <script type="text/javascript">
             let droomPlayer;
             window.onload = function(){
                 let video = document.getElementById('videoPlayer');
-                droomPlayer = playerManager( video );
+                let videoWrapped = new HtmlPlayerWrapper(video);
+                droomPlayer = playerManager( videoWrapped );
             }
         </script>
     </body>

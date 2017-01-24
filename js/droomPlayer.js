@@ -1,171 +1,133 @@
+class Seeker{
 
-class ShortKey {
+    constructor( player ){
+        this.player = player;
+        this.videoLength = 100;
+        this.seconds = 0;
+        this.width = 400;
+        this.init();
+        return;
+    }
+    // logger.debug('Seeker', ' video length:', this.videoLength);
+    // logger.debug('Seeker', ' seeker width:', this.seekerWidth);
 
-    constructor( keyId, keyPressed, description, action, reaction){
-        this.keyId = keyId;
-        this.action = action;
-        this.reaction = reaction;
-        this.description = description;
-        this.setListeners();
+    init(){
+        logger.debug('Seeker', ' Initializing. ');
+        this.seekerTag = document.getElementById("seeker");
+        this.seekerWidth = this.seekerTag.offsetWidth;
+        this.width = 500;
+        this.createSvg();
+        // console.dir(this.player);
+        this.updateLength( this.player.duration );
+        this.updateTimeToPixelScale();
+        this.updatePixelToTimeScale();
+        this.createSeekerRectangle();
+        this.setSeekerListeners();
+        this.setPlayerListener();
     }
 
-    getKeyId(){
-        return this.idkeyId;
-    }
+    createSvg(){
 
-    getAction(){
-        return this.action;
-    }
-
-    getReaction(){
-        return this.reaction;
-    }
-
-    getDescription(){
-        return this.description;
-    }
-
-    setListeners(){
-
-        if( Array.isArray(this.reaction) ){
-
-            this.keyUp = this.reaction[1];
-            this.keyDown = this.reaction[0];
-
-        }else if( this.action == 'down' ){
-
-            this.keyUp = ()=>{};
-            this.keyDown = this.reaction;
-
-        }else{
-            this.keyUp = this.reaction;
-            this.keyDown = ()=>{};
-
-        }
-    }
-
-}
-
-
-
-
-let seeker  = function( player ){
-    let sk = this;
-    sk.videoLength = 100;
-    sk.seconds = 0;
-    sk.width = 400;
-    sk.player = player;
-    // logger.debug('Seeker', ' video length:', sk.videoLength);
-    // logger.debug('Seeker', ' seeker width:', sk.seekerWidth);
-
-    sk.init = ()=> {
-
-        sk.seeker = document.getElementById("seeker");
-        sk.seekerWidth = sk.seeker.offsetWidth;
-        sk.createSvg();
-        sk.updateLength( sk.player.getDuration() );
-        sk.updateTimeToPixelScale();
-        sk.updatePixelToTimeScale();
-        sk.createSeekerRectangle();
-        sk.setSeekerListeners();
-    }
-
-    sk.createSvg = ()=> {
-
-        sk.svgContainer = d3.select("#seeker").append("svg")
+        this.svgContainer = d3.select("#seeker").append("svg")
         .attr("width", "100%")
         .attr("height", 50)
         .attr("style", "background-color: #999;");
 
-        sk.svg = d3.select("svg"),
-        width = +svg.attr("width"),
-        height = +svg.attr("height"),
-        g = svg.append("g");
+        this.svg = d3.select("svg");
 
     }
 
-    sk.createSeekerRectangle = ()=> {
+    createSeekerRectangle(){
 
-        sk.rectangle = svgContainer.append("rect")
+        this.rectangle = this.svgContainer.append("rect")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("width", sk.timeToPixelScale(sk.seconds))
+        .attr("width", this.timeToPixelScale(this.seconds))
         .attr("height", 50)
         .attr("style", "fill: black;");
 
     }
 
-    sk.updateLength = ( length )=> {
+    updateLength( length ){
 
-        sk.videoLength = length;
-        sk.updateTimeToPixelScale();
-        sk.updatePixelToTimeScale();
+        this.videoLength = length;
+        this.updateTimeToPixelScale();
+        this.updatePixelToTimeScale();
 
     }
 
-    sk.updateTimeToPixelScale = ()=> {
-        sk.timeToPixelScale = d3.scaleLinear()
-        .domain([0, sk.videoLength])
-        .range([0, sk.seekerWidth]);
+    updateTimeToPixelScale(){
+        this.timeToPixelScale = d3.scaleLinear()
+        .domain([0, this.videoLength])
+        .range([0, this.seekerWidth]);
     }
 
-    sk.updatePixelToTimeScale = ()=> {
-        sk.pixelToTimeScale = d3.scaleLinear()
-        .domain([0, sk.seekerWidth])
-        .range([0, sk.videoLength]);
+    updatePixelToTimeScale(){
+        this.pixelToTimeScale = d3.scaleLinear()
+        .domain([0, this.seekerWidth])
+        .range([0, this.videoLength]);
     }
 
-    sk.update = ()=> {
+    update(){
+        this.rectangle.attr( "width", this.timeToPixelScale( this.player.currentTime ) );
 
-        sk.rectangle.attr( "width", sk.timeToPixelScale( sk.player.getCurrentTime() ) );
+        if ( this.refresh ) {
 
-        if ( sk.refresh ) {
-
-            window.requestAnimationFrame(sk.update);
+            window.requestAnimationFrame(this.update.bind(this));
 
         }
 
     }
 
-    sk.startRefresh = ()=>{
+    startRefresh(){
 
         logger.debug('Seeker', ' started refreshing seeker. ');
-        sk.refresh = true;
-        window.requestAnimationFrame(sk.update);
+        this.refresh = true;
+        window.requestAnimationFrame(this.update.bind(this));
     }
 
-    sk.stopRefresh  = ()=> {
+    stopRefresh(){
 
         logger.debug('Seeker', ' stopped refreshing seeker. ');
-        sk.refresh = false;
+        this.refresh = false;
 
     }
 
-    sk.seekTo = (e)=>{
+    seekTo(e){
 
-        let timeInPixels = e.pageX - sk.seeker.offsetLeft;
-        sk.player.setCurrentTime( sk.pixelToTimeScale( timeInPixels ) );
+        let timeInPixels = e.pageX - this.seekerTag.offsetLeft;
+        player.currentTime = this.pixelToTimeScale( timeInPixels ) ;
 
     }
 
-    sk.setSeekerListeners = ()=>{
-        sk.seeker.addEventListener("mousedown", sk.seekTo);
-        sk.seeker.addEventListener("mouseup", function(){
+    setSeekerListeners(){
+        this.seekerTag.addEventListener("mousedown", this.seekTo.bind(this));
+        this.seekerTag.addEventListener("mouseup", function(){
 
         });
+
     }
 
-    sk.init();
+    setPlayerListener(){
 
-    return sk;
-}
+        var listenerCallback = ()=>{
+
+            // console.dir(this);
+            if( ! this.player.isPlaying() ){
+                var bindedUpdate = this.update.bind(this);
+                bindedUpdate();
+            }
+        }
+        this.player.timeUpdateListener = listenerCallback;
+    }
+};
 
 
 
-let playerManager = function( video ){
+var playerManager = function( video ){
     logger.debug("droomPlayer", 'Starting up...');
 
-    let pm = this;
+    var pm = this;
     pm.player = video;
     pm.mappedShortKeys = {};
 
@@ -176,43 +138,44 @@ let playerManager = function( video ){
 
     }
 
-    pm.initSeeker = ()=> {
+    pm.initSeeker = ()=>{
 
-        pm.seekerVideo = seeker( pm.player );
-
-        pm.player.addEventListener("timeupdate", function(){
-            if( ! pm.isPlaying() ){
-                pm.seekerVideo.update();
-            }
-        });
+        // console.dir(typeof(pm.player))
+        pm.seekerVideo = new Seeker(  pm.player );
+        //
+        // pm.player.addEventListener("timeupdate", function(){
+        //     if( ! pm.isPlaying() ){
+        //         pm.seekerVideo.update();
+        //     }
+        // });
 
     }
 
-    pm.player.setCurrentTime = ( time )=>{
-        pm.player.currentTime = time;
+    pm.setCurrentTime = ( time )=>{
+        pm.player.currentTime = time ;
     }
 
-    pm.player.getCurrentTime = ( )=>{
+    pm.getCurrentTime = ()=>{
         return pm.player.currentTime;
     }
 
-    pm.player.getDuration = ()=>{
+    pm.getDuration = ()=>{
         return pm.player.duration;
     }
 
     pm.loadVideo = ( url )=>{
 
-        pm.player.src = url;
+        pm.player.source = url ;
         pm.seekerVideo.updateLength( pm.player.duration );
 
     }
 
     pm.play = ()=>{
-
+        // console.dir(pm.isPlaying())
         if ( !pm.isPlaying() ) {
 
             pm.seekerVideo.startRefresh();
-            return pm.player.play();
+            pm.player.play();
 
         }
 
@@ -221,7 +184,7 @@ let playerManager = function( video ){
     pm.pause = ()=>{
         if ( pm.isPlaying() ) {
             pm.seekerVideo.stopRefresh();
-            return pm.player.pause();
+            pm.player.pause();
         }
     };
 
@@ -237,15 +200,15 @@ let playerManager = function( video ){
 
     pm.isPlaying = ()=>{
 
-        return !pm.player.paused;
+        return pm.player.isPlaying();
 
     };
 
     pm.seekToTime = ( time, isRelative )=>{
 
         var newVideoTime = ( isRelative ) ? pm.player.currentTime + time : time;
-        newVideoTime = ( newVideoTime < 0 ) ? 0 : ( newVideoTime > pm.player.duration) ? pm.player.duration : newVideoTime;
-        pm.player.currentTime = newVideoTime;
+        newVideoTime = ( newVideoTime < 0 ) ? 0 : ( newVideoTime > pm.player.duration ) ? pm.player.duration : newVideoTime;
+        pm.player.currentTime = newVideoTime ;
 
 
     }
@@ -265,10 +228,10 @@ let playerManager = function( video ){
 
         window.onkeydown = (e)=>{
 
-            let key = e.keyCode ? e.keyCode : e.which;
+            var key = e.keyCode ? e.keyCode : e.which;
             e.preventDefault();
             logger.debug("Listeners", 'Received on key down: '+ e.keyCode);
-            let shortKey = pm.mappedShortKeys[key];
+            var shortKey = pm.mappedShortKeys[key];
             if( typeof(shortKey) !== 'undefined'){
 
                 shortKey.keyDown();
@@ -278,10 +241,10 @@ let playerManager = function( video ){
 
         window.onkeyup = (e)=>{
 
-            let key = e.keyCode ? e.keyCode : e.which;
+            var key = e.keyCode ? e.keyCode : e.which;
             e.preventDefault();
             logger.debug("Listeners", 'Received on key up: '+ e.keyCode);
-            let shortKey = pm.mappedShortKeys[key];
+            var shortKey = pm.mappedShortKeys[key];
             if( typeof(shortKey) !== 'undefined'){
 
                 shortKey.keyUp();
@@ -301,4 +264,4 @@ let playerManager = function( video ){
     return pm;
 }
 
-let testPlayer = new HtmlPlayerWrapper();
+var testPlayer = new HtmlPlayerWrapper();
