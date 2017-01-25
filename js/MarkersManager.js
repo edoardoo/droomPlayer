@@ -5,8 +5,6 @@ class MarkersManager{
         this._recordinMedia = false;
         this._currentMarker = 0;
         return;
-
-
     }
 
     set markers( markers ){

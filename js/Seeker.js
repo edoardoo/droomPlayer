@@ -1,29 +1,32 @@
 class Seeker{
 
-    constructor( player ){
+    constructor( container, player, svgManager ){
         this.player = player;
+        this.svgManager = svgManager;
         this.videoLength = 100;
         this.seconds = 0;
         this.width = 400;
+        this.container = container;
         this.init();
         return;
     }
-    // logger.debug('Seeker', ' video length:', this.videoLength);
-    // logger.debug('Seeker', ' seeker width:', this.seekerWidth);
 
     init(){
         logger.debug('Seeker', ' Initializing. ');
-        this.seekerTag = document.getElementById("seeker");
-        this.seekerWidth = this.seekerTag.offsetWidth;
-        this.width = 500;
+
         this.createSvg();
-        // console.dir(this.player);
-        this.updateLength( this.player.duration );
-        this.updateTimeToPixelScale();
-        this.updatePixelToTimeScale();
         this.createSeekerRectangle();
         this.setSeekerListeners();
         this.setPlayerListener();
+
+    }
+
+    set container( container ){
+        this._container = container;
+    }
+
+    get container(){
+        return this._container;
     }
 
     createSvg(){
@@ -39,37 +42,17 @@ class Seeker{
 
     createSeekerRectangle(){
 
-        this.rectangle = this.svgContainer.append("rect")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("width", this.timeToPixelScale(this.seconds))
-        .attr("height", 50)
-        .attr("style", "fill: black;");
+        this.rectangle = new Rectangle(
+            this.svgContainer,
+            "black",
+            this.svgManager.timeToPixelScale( this.seconds )
+        );
 
-    }
-
-    updateLength( length ){
-
-        this.videoLength = length;
-        this.updateTimeToPixelScale();
-        this.updatePixelToTimeScale();
-
-    }
-
-    updateTimeToPixelScale(){
-        this.timeToPixelScale = d3.scaleLinear()
-        .domain([0, this.videoLength])
-        .range([0, this.seekerWidth]);
-    }
-
-    updatePixelToTimeScale(){
-        this.pixelToTimeScale = d3.scaleLinear()
-        .domain([0, this.seekerWidth])
-        .range([0, this.videoLength]);
     }
 
     update(){
-        this.rectangle.attr( "width", this.timeToPixelScale( this.player.currentTime ) );
+
+        this.rectangle.width = this.svgManager.timeToPixelScale( this.player.currentTime );
 
         if ( this.refresh ) {
 
@@ -95,17 +78,14 @@ class Seeker{
 
     seekTo(e){
 
-        let timeInPixels = e.pageX - this.seekerTag.offsetLeft;
-        player.currentTime = this.pixelToTimeScale( timeInPixels ) ;
+        let timeInPixels = e.pageX - this.container.offsetLeft;
+        player.currentTime = this.svgManager.pixelToTimeScale( timeInPixels ) ;
 
     }
 
     setSeekerListeners(){
 
-        this.seekerTag.addEventListener("mousedown", this.seekTo.bind(this));
-        this.seekerTag.addEventListener("mouseup", function(){
-
-        });
+        this.container.addEventListener("mousedown", this.seekTo.bind(this));
 
     }
 

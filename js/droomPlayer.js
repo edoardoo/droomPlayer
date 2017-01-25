@@ -4,9 +4,11 @@ var playerManager = function( video ){
     var pm = this;
     pm.player = video;
     pm.mappedShortKeys = {};
+    pm.svgContainer = document.getElementById('seeker');
 
     pm.init = ()=>{
 
+        pm.initSvgManager();
         pm.initSeeker();
         pm.setListeners();
         pm.initMarkersManager();
@@ -14,8 +16,12 @@ var playerManager = function( video ){
 
     }
 
+    pm.initSvgManager = ()=>{
+        pm.svgManager = new SvgManager( pm.svgContainer, pm.player );
+    }
+
     pm.initSeeker = ()=>{
-        pm.seekerVideo = new Seeker(  pm.player );
+        pm.seekerVideo = new Seeker( pm.svgContainer ,pm.player, pm.svgManager );
     }
 
     pm.setCurrentTime = ( time )=>{
@@ -122,7 +128,7 @@ var playerManager = function( video ){
 
     pm.markers = [];
     pm.startMarker = function(){
-    
+
         pm.markersManager.startMarker().then(()=>{
             pm.play();
         });
@@ -144,7 +150,7 @@ var playerManager = function( video ){
     pm.shortKeys = [
         new ShortKey( 32, '[space]', 'playOnPress' , 'hold', [pm.play, pm.pause] ),
         new ShortKey( 80, 'p', 'playToggle'  , 'down', pm.toggle ),
-        new ShortKey( 77, 'm', 'startMarker' , 'hold', [pm.startMarker, pm.stopMarker])
+        new ShortKey( 77, 'm', 'marker' , 'hold', [pm.startMarker, pm.stopMarker])
     ];
 
 
