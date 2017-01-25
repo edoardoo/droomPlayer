@@ -9,6 +9,7 @@ var playerManager = function( video ){
 
         pm.initSeeker();
         pm.setListeners();
+        pm.initMarkersManager();
         pm.recordingMarker = false;
 
     }
@@ -95,10 +96,10 @@ var playerManager = function( video ){
         window.onkeydown = (e)=>{
 
             var key = e.keyCode ? e.keyCode : e.which;
-            e.preventDefault();
             logger.debug("Listeners", 'Received on key down: '+ e.keyCode);
             var shortKey = pm.mappedShortKeys[key];
             if( typeof(shortKey) !== 'undefined'){
+                e.preventDefault();
 
                 shortKey.keyDown();
 
@@ -108,10 +109,10 @@ var playerManager = function( video ){
         window.onkeyup = (e)=>{
 
             var key = e.keyCode ? e.keyCode : e.which;
-            e.preventDefault();
             logger.debug("Listeners", 'Received on key up: '+ e.keyCode);
             var shortKey = pm.mappedShortKeys[key];
             if( typeof(shortKey) !== 'undefined'){
+                e.preventDefault();
 
                 shortKey.keyUp();
             }
@@ -121,26 +122,23 @@ var playerManager = function( video ){
 
     pm.markers = [];
     pm.startMarker = function(){
-        if ( !pm.recordingMarker ) {
-            if ( !pm.player.isPlaying()) {
-                pm.play();
-            }
-            // logger.debug("PlayerManager", "got this:", this);
-            pm.currentMarker = pm.markers.push(new Marker(pm.player.currentTime));
-            pm.recordingMarker = true;
-
-        }
+    
+        pm.markersManager.startMarker().then(()=>{
+            pm.play();
+        });
 
     }
 
     pm.stopMarker = function(){
 
-        if ( pm.player.isPlaying()) {
-            pm.pause();
-        }
-        pm.recordingMarker = false;
-        pm.markers[ pm.currentMarker - 1 ].end = pm.player.currentTime;
+        pm.markersManager.stopMarker().then(()=>{
+            pm.pause()
+        });
 
+    }
+
+    pm.initMarkersManager = function () {
+        pm.markersManager = new MarkersManager( pm.player );
     }
 
     pm.shortKeys = [
