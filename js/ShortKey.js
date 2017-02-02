@@ -1,46 +1,46 @@
 class ShortKey {
 
-    constructor( keyId, keyPressed, description, action, reaction){
-        this.keyId = keyId;
-        this.action = action;
-        this.reaction = reaction;
-        this.description = description;
-        this.setListeners();
-    }
+	constructor( keyId, keyPressed, description, action, reaction ) {
+		this.keyId = keyId;
+		this.action = action;
+		this.reaction = reaction;
+		this.description = description;
+		this.setListeners();
+	}
 
-    getKeyId(){
-        return this.idkeyId;
-    }
+	getKeyId() {
+		return this.idkeyId;
+	}
 
-    getAction(){
-        return this.action;
-    }
+	getAction() {
+		return this.action;
+	}
 
-    getReaction(){
-        return this.reaction;
-    }
+	getReaction() {
+		return this.reaction;
+	}
 
-    getDescription(){
-        return this.description;
-    }
+	getDescription() {
+		return this.description;
+	}
 
-    setListeners(){
+	setListeners() {
 
-        if( Array.isArray(this.reaction) ){
+		if ( Array.isArray( this.reaction ) ) {
 
-            this.keyUp = this.reaction[1].bind(this);
-            this.keyDown = this.reaction[0].bind(this);
+			this.keyUp = this.reaction[ 1 ].bind( this );
+			this.keyDown = this.reaction[ 0 ].bind( this );
 
-        }else if( this.action == 'down' ){
+		} else if ( this.action == 'down' ) {
 
-            this.keyUp = ()=>{};
-            this.keyDown = this.reaction.bind(this);
+			this.keyUp = () => {};
+			this.keyDown = this.reaction.bind( this );
 
-        }else{
-            this.keyUp = this.reaction.bind(this);
-            this.keyDown = ()=>{};
+		} else {
+			this.keyUp = this.reaction.bind( this );
+			this.keyDown = () => {};
 
-        }
-    }
+		}
+	}
 
 }

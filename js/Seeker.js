@@ -1,103 +1,112 @@
-class Seeker{
+class Seeker {
 
-    constructor( container, player, svgManager ){
-        this.player = player;
-        this.svgManager = svgManager;
-        this.videoLength = 100;
-        this.seconds = 0;
-        this.width = 400;
-        this.container = container;
-        this.init();
-        return;
-    }
+	constructor( container, player, svgManager ) {
+		this.player = player;
+		this.svgManager = svgManager;
+		this.videoLength = 100;
+		this.seconds = 0;
+		this.width = 400;
+		this.container = container;
+		this.init();
+		return;
+	}
 
-    init(){
-        logger.debug('Seeker', ' Initializing. ');
+	init() {
+		logger.debug( 'Seeker', ' Initializing. ' );
 
-        this.createSvg();
-        this.createSeekerRectangle();
-        this.setSeekerListeners();
-        this.setPlayerListener();
+		this.createSvg();
+		this.createSeekerRectangle();
+		this.setSeekerListeners();
+		this.setPlayerListener();
 
-    }
+	}
 
-    set container( container ){
-        this._container = container;
-    }
+	set container( container ) {
+		this._container = container;
+	}
 
-    get container(){
-        return this._container;
-    }
+	get container() {
+		return this._container;
+	}
 
-    createSvg(){
+	createSvg() {
 
-        this.svgContainer = d3.select("#seeker").append("svg")
-        .attr("width", "100%")
-        .attr("height", 50)
-        .attr("style", "background-color: #999;");
+		this.svgContainer = d3.select( "#seeker" )
+			.append( "svg" )
+			.attr( "width", "100%" )
+			.attr( "height", 50 )
+			.attr( "style", "background-color: #999;" );
 
-        this.svg = d3.select("svg");
+		this.svg = d3.select( "svg" );
 
-    }
+	}
 
-    createSeekerRectangle(){
+	createSeekerRectangle() {
 
-        this.rectangle = new Rectangle(
-            this.svgContainer,
-            "black",
-            this.svgManager.timeToPixelScale( this.seconds )
-        );
+		this.rectangle = new Rectangle(
+			this.svgContainer,
+			"black",
+			0,
+			this.svgManager.timeToPixelScale( this.seconds )
+		);
 
-    }
+	}
 
-    update(){
+	update() {
 
-        this.rectangle.width = this.svgManager.timeToPixelScale( this.player.currentTime );
+		this.rectangle.width = this.svgManager.timeToPixelScale(
+			this.player.currentTime
+		);
 
-        if ( this.refresh ) {
+		if ( this.refresh ) {
 
-            window.requestAnimationFrame(this.update.bind(this));
+			window.requestAnimationFrame( this.update.bind( this ) );
 
-        }
+		}
 
-    }
+	}
 
-    startRefresh(){
+	startRefresh() {
 
-        logger.debug('Seeker', ' started refreshing seeker. ');
-        this.refresh = true;
-        window.requestAnimationFrame(this.update.bind(this));
-    }
+		logger.debug( 'Seeker', ' started refreshing seeker. ' );
+		this.refresh = true;
+		window.requestAnimationFrame( this.update.bind( this ) );
+	}
 
-    stopRefresh(){
+	stopRefresh() {
 
-        logger.debug('Seeker', ' stopped refreshing seeker. ');
-        this.refresh = false;
+		logger.debug( 'Seeker', ' stopped refreshing seeker. ' );
+		this.refresh = false;
 
-    }
+	}
 
-    seekTo(e){
+	seekTo( e ) {
 
-        let timeInPixels = e.pageX - this.container.offsetLeft;
-        player.currentTime = this.svgManager.pixelToTimeScale( timeInPixels ) ;
+		let timeInPixels = e.pageX - this.container.offsetLeft;
+		player.currentTime = this.svgManager.pixelToTimeScale(
+			timeInPixels
+		);
 
-    }
+	}
 
-    setSeekerListeners(){
+	setSeekerListeners() {
 
-        this.container.addEventListener("mousedown", this.seekTo.bind(this));
+		this.container.addEventListener(
+			"mousedown",
+			this.seekTo.bind( this )
+		);
 
-    }
+	}
 
-    setPlayerListener(){
+	setPlayerListener() {
 
-        var listenerCallback = ()=>{
+		var listenerCallback = () => {
 
-            if( ! this.player.isPlaying() ){
-                var bindedUpdate = this.update.bind(this);
-                bindedUpdate();
-            }
-        }
-        this.player.timeUpdateListener = listenerCallback;
-    }
+			if ( !this.player.isPlaying() ) {
+				var bindedUpdate = this.update.bind( this );
+				bindedUpdate();
+			}
+		}
+		this.player.timeUpdateListener = listenerCallback;
+	}
 };

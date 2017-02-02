@@ -1,70 +1,77 @@
-class Rectangle{
-    constructor( container, color, width ){
+class Rectangle {
+	constructor( container, color, start, width ) {
 
-        this.color = color;
-        this._width = width;
-        this.container = container;
-        this.initSvgRectangle();
-        return;
-    }
+		this.color = color;
+		this._width = width;
+		this._start = start;
+		this.container = container;
+		this.initSvgRectangle();
+		return;
+	}
 
-    set svgElement( e ){
-        this._svgElement = e;
-    }
+	set svgElement( e ) {
+		this._svgElement = e;
+	}
 
-    get svgElement(){
-        return this._svgElement;
-    }
+	get svgElement() {
+		return this._svgElement;
+	}
 
-    set color( color ){
-        this._color = color;
-    }
+	set color( color ) {
+		this._color = color;
+	}
 
-    get color(){
-        return this._color;
-    }
+	get color() {
+		return this._color;
+	}
 
-    set width( width ){
+	set width( width ) {
 
-        this._width = width;
-        this._svgElement.attr( "width", width );
+		this._width = width;
+		this._svgElement.attr( "width", width );
 
-    }
+	}
 
-    get width(){
-        return this._width;
+	get width() {
+		return this._width;
 
-    }
+	}
 
-    set svgWidth( width ){
+	set start( start ) {
+		this._start = start;
+	}
 
-        this._svgElement.attr( "width", width );
+	get start() {
+		return this._width;
+	}
 
-    }
+	set svgWidth( width ) {
 
-    get svgWidth(){
+		this._svgElement.attr( "width", width );
 
-        return this._svgElement.attr( "width" );
+	}
 
-    }
+	get svgWidth() {
 
-    set container( container ){
-        this._container = container;
-    }
+		return this._svgElement.attr( "width" );
 
-    get container(){
-        return this._container;
-    }
+	}
 
-    initSvgRectangle(){
-        this.svgElement = this.container.append("rect")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("width", this.width)
-        .attr("height", 50)
-        .attr("style", "fill:" + this.color +";");
-    }
+	set container( container ) {
+		this._container = container;
+	}
 
+	get container() {
+		return this._container;
+	}
 
+	initSvgRectangle() {
+		this.svgElement = this.container.append( "rect" )
+			.attr( "x", this.start )
+			.attr( "y", 0 )
+			.attr( "width", this.width )
+			.attr( "height", 50 )
+			.attr( "style", "fill:" + this.color + ";" );
+	}
 
 }
