@@ -32,11 +32,13 @@ class MarkersManager {
 
 		if ( this._markers.length > 0 && !this._recordingMarker ) {
 
-			console.log( this._media.currentTime - this._markers[
-				this._markers.length - 1 ].end )
-			var shouldAttachToPrevious = this._markers.length > 0 && this._media
+
+			var currentEndTime = this._media
 				.currentTime - this._markers[
-					this._markers.length - 1 ].end < 0.5;
+					this._markers.length - 1 ].end;
+
+			var shouldAttachToPrevious = currentEndTime < 0.5 &&
+				currentEndTime >= 0;
 		}
 
 		if ( !this._recordingMarker && !shouldAttachToPrevious ) {
