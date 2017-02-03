@@ -13,4 +13,9 @@ video {
 
 #seeker {
   width: 100%;
-  height: 20px; }
+  height: 25px;
+  position: relative; }
+
+#markers {
+  position: relative;
+  height: 25px; }

@@ -34,8 +34,8 @@ class Seeker {
 		this.svgContainer = d3.select( "#seeker" )
 			.append( "svg" )
 			.attr( "width", "100%" )
-			.attr( "height", 50 )
-			.attr( "style", "background-color: #999;" );
+			.attr( "height", 25 )
+			.attr( "style", "background-color: #414141;" );
 
 		this.svg = d3.select( "svg" );
 
@@ -45,9 +45,10 @@ class Seeker {
 
 		this.rectangle = new Rectangle(
 			this.svgContainer,
-			"black",
+			"#222",
 			0,
-			this.svgManager.timeToPixelScale( this.seconds )
+			this.svgManager.timeToPixelScale( this.seconds ),
+			"seeker"
 		);
 
 	}

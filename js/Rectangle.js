@@ -1,10 +1,11 @@
 class Rectangle {
-	constructor( container, color, start, width ) {
+	constructor( container, color, start, width, htmlId ) {
 
 		this.color = color;
 		this._width = width;
 		this._start = start;
-		this.container = container;
+		this._htmlId = htmlId;
+		this._container = container;
 		this.initSvgRectangle();
 		return;
 	}
@@ -66,11 +67,12 @@ class Rectangle {
 	}
 
 	initSvgRectangle() {
-		this.svgElement = this.container.append( "rect" )
-			.attr( "x", this.start )
+		this.svgElement = this._container.append( "rect" )
+			.attr( "id", this._htmlId )
+			.attr( "x", this._start )
 			.attr( "y", 0 )
-			.attr( "width", this.width )
-			.attr( "height", 50 )
+			.attr( "width", this._width )
+			.attr( "height", 25 )
 			.attr( "style", "fill:" + this.color + ";" );
 	}
 

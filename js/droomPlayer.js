@@ -148,7 +148,15 @@ var playerManager = function ( video ) {
 	};
 
 	pm.initMarkersManager = function () {
-		pm.markersManager = new MarkersManager( pm.player );
+		pm.markersManager = new MarkersManager(
+			pm.player,
+			pm.svgManager,
+			d3.select( "#markers" )
+			.append( "svg" )
+			.attr( "width", "100%" )
+			.attr( "height", 25 )
+			.attr( "style", "background-color: transparent;" )
+		);
 	};
 
 	pm.shortKeys = [
