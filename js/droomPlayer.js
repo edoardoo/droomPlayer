@@ -101,14 +101,18 @@ var playerManager = function ( video ) {
 
 		pm.prepareMappedKeysObject();
 
+		pm.bufferShortKeysState = [];
+
 		window.onkeydown = ( e ) => {
 
 			var key = e.keyCode ? e.keyCode : e.which;
 			logger.debug( "Listeners", 'Received on key down: ' + e.keyCode );
 			var shortKey = pm.mappedShortKeys[ key ];
-			if ( typeof ( shortKey ) !== 'undefined' ) {
-				e.preventDefault();
+			pm.bufferShortKeysState[ key ] = typeof( pm.bufferShortKeysState[ key ] ) === 'undefined' ? true : pm.bufferShortKeysState[ key ];
 
+			if ( typeof ( shortKey ) !== 'undefined' && pm.bufferShortKeysState[ key ]) {
+				e.preventDefault();
+				pm.bufferShortKeysState[ key ] = false;
 				shortKey.keyDown();
 
 			}
@@ -121,14 +125,14 @@ var playerManager = function ( video ) {
 			var shortKey = pm.mappedShortKeys[ key ];
 			if ( typeof ( shortKey ) !== 'undefined' ) {
 				e.preventDefault();
-
+				pm.bufferShortKeysState[ key ] = true;
 				shortKey.keyUp();
 			};
 		};
 
 		window.onresize = ( e ) => {
 			logger.debug( "Listeners", 'resizing.' );
-			pm.svgManager.updateScales();
+			//pm.svgManager.updateScales();
 		}
 
 	}

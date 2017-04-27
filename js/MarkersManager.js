@@ -29,16 +29,14 @@ class MarkersManager {
 
 		let complete = Q.defer();
 		var shouldAttachToPrevious = false;
+		this._refresh = true;
 
 		if ( this._markers.length > 0 && !this._recordingMarker ) {
 
 
-			var currentEndTime = this._media
-				.currentTime - this._markers[
-					this._markers.length - 1 ].end;
+			var currentEndTime = this._media.currentTime - this._markers[ this._markers.length - 1 ].end;
 
-			var shouldAttachToPrevious = currentEndTime < 0.5 &&
-				currentEndTime >= 0;
+			var shouldAttachToPrevious = currentEndTime < 0.5 && currentEndTime >= 0;
 		}
 
 		if ( !this._recordingMarker && !shouldAttachToPrevious ) {
@@ -53,10 +51,8 @@ class MarkersManager {
 			this._recordingMarker = true;
 			complete.resolve();
 
-		} else {
-			this._markers[ this._currentMarker ].end = this._media.currentTime;
 		}
-
+		window.requestAnimationFrame( this.update.bind( this ) );
 		complete.resolve();
 
 
@@ -67,6 +63,7 @@ class MarkersManager {
 
 		let complete = Q.defer();
 		this._recordingMarker = false;
+		this._refresh = false;
 		this._markers[ this._currentMarker ].end = this._media.currentTime;
 		complete.resolve();
 
@@ -74,7 +71,20 @@ class MarkersManager {
 
 	}
 
+	createMarker(){
+
+	}
+
 	update() {
+
+		this._markers[ this._currentMarker ].end = this._media.currentTime;
+
+		if ( this._refresh ) {
+
+			window.requestAnimationFrame( this.update.bind( this ) );
+
+		}
+
 
 	}
 
