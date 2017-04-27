@@ -126,6 +126,11 @@ var playerManager = function ( video ) {
 			};
 		};
 
+		window.onresize = ( e ) => {
+			logger.debug( "Listeners", 'resizing.' );
+			pm.svgManager.updateScales();
+		}
+
 	}
 
 	pm.markers = [];
