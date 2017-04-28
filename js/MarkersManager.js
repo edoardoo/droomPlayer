@@ -4,7 +4,7 @@ class MarkersManager {
 		this._media = media;
 		this._svgManager = svgManager;
 		this._svgContainer = svgContainer;
-		this._recordingMedia = false;
+		this._refresh = false;
 		this._currentMarker = 0;
 		return;
 	}
@@ -17,6 +17,10 @@ class MarkersManager {
 		return this._markers;
 	}
 
+	get isRunning() {
+		return this._refresh;
+	}
+
 	set media( media ) {
 		this._media = media;
 	}
@@ -26,6 +30,7 @@ class MarkersManager {
 	}
 
 	startMarker() {
+		logger.debug( "Markers Manager", "start refreshing. " );
 
 		let complete = Q.defer();
 		var shouldAttachToPrevious = false;
@@ -34,12 +39,22 @@ class MarkersManager {
 		if ( this._markers.length > 0 && !this._recordingMarker ) {
 
 
-			var currentEndTime = this._media.currentTime - this._markers[ this._markers.length - 1 ].end;
+			var currentEndTime = this._media.currentTime - this._markers[
+				this._markers.length - 1 ].end;
 
-			var shouldAttachToPrevious = currentEndTime < 0.5 && currentEndTime >= 0;
+			var shouldAttachToPrevious = currentEndTime < 0.5 &&
+				currentEndTime >= 0;
+
+			if ( shouldAttachToPrevious ) {
+				logger.debug( "Markers Manager", "attaching to previous marker." );
+			}
+
+
 		}
 
 		if ( !this._recordingMarker && !shouldAttachToPrevious ) {
+
+			logger.debug( "Markers Manager", "creating new marker. " );
 
 			this._currentMarker = this._markers.push(
 				new Marker(
@@ -61,22 +76,26 @@ class MarkersManager {
 
 	stopMarker() {
 
+		logger.debug( "Markers Manager", "stop refreshing. " );
 		let complete = Q.defer();
 		this._recordingMarker = false;
 		this._refresh = false;
 		this._markers[ this._currentMarker ].end = this._media.currentTime;
+
 		complete.resolve();
 
 		return complete.promise;
 
 	}
 
-	createMarker(){
+	createMarker() {
 
 	}
 
+
 	update() {
 
+		// logger.debug( "Markers Manager", "state of refresh: " + this._refresh );
 		this._markers[ this._currentMarker ].end = this._media.currentTime;
 
 		if ( this._refresh ) {

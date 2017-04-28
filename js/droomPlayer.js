@@ -5,6 +5,8 @@ var playerManager = function ( video ) {
 	pm.player = video;
 	pm.mappedShortKeys = {};
 	pm.svgContainer = document.getElementById( 'seeker' );
+	pm.playStartedIndipendently = false;
+	pm.shortKeyIsPressed = [];
 
 	pm.init = () => {
 
@@ -43,6 +45,11 @@ var playerManager = function ( video ) {
 
 	};
 
+	pm.playIndipendently = () => {
+		pm.playStartedIndipendently = true;
+		pm.play();
+	}
+
 	pm.play = () => {
 		// console.dir(pm.isPlaying())
 		if ( !pm.isPlaying() ) {
@@ -60,6 +67,11 @@ var playerManager = function ( video ) {
 			pm.player.pause();
 		}
 	};
+
+	pm.pauseIndipendently = () => {
+		pm.playStartedIndipendently = false;
+		pm.pause();
+	}
 
 	pm.toggle = () => {
 
@@ -101,18 +113,24 @@ var playerManager = function ( video ) {
 
 		pm.prepareMappedKeysObject();
 
-		pm.bufferShortKeysState = [];
-
 		window.onkeydown = ( e ) => {
 
 			var key = e.keyCode ? e.keyCode : e.which;
-			logger.debug( "Listeners", 'Received on key down: ' + e.keyCode );
+			// logger.debug( "Listeners", 'Received on key down: ' + e.keyCode );
 			var shortKey = pm.mappedShortKeys[ key ];
-			pm.bufferShortKeysState[ key ] = typeof( pm.bufferShortKeysState[ key ] ) === 'undefined' ? true : pm.bufferShortKeysState[ key ];
 
-			if ( typeof ( shortKey ) !== 'undefined' && pm.bufferShortKeysState[ key ]) {
+
+			pm.shortKeyIsPressed[ key ] = typeof (
+					pm.shortKeyIsPressed[ key ] ) === 'undefined' ?
+				false : pm.shortKeyIsPressed[ key ];
+
+
+			if ( typeof ( shortKey ) !== 'undefined' &&
+				!pm.shortKeyIsPressed[ key ] ) {
+
+				pm.shortKeyIsPressed[ key ] = true;
 				e.preventDefault();
-				pm.bufferShortKeysState[ key ] = false;
+
 				shortKey.keyDown();
 
 			}
@@ -121,18 +139,24 @@ var playerManager = function ( video ) {
 		window.onkeyup = ( e ) => {
 
 			var key = e.keyCode ? e.keyCode : e.which;
-			logger.debug( "Listeners", 'Received on key up: ' + e.keyCode );
+			// logger.debug( "Listeners", 'Received on key up: ' + e.keyCode );
+
 			var shortKey = pm.mappedShortKeys[ key ];
-			if ( typeof ( shortKey ) !== 'undefined' ) {
+			if ( typeof ( shortKey ) !== 'undefined' &&
+				pm.shortKeyIsPressed[ key ] ) {
+
+				pm.shortKeyIsPressed[ key ] = false;
+
+
 				e.preventDefault();
-				pm.bufferShortKeysState[ key ] = true;
+
 				shortKey.keyUp();
 			};
 		};
 
 		window.onresize = ( e ) => {
 			logger.debug( "Listeners", 'resizing.' );
-			//pm.svgManager.updateScales();
+			pm.svgManager.updateScales(); //ahahahah
 		}
 
 	}
@@ -151,7 +175,11 @@ var playerManager = function ( video ) {
 
 		pm.markersManager.stopMarker()
 			.then( () => {
-				pm.pause();
+
+				if ( !pm.playStartedIndipendently ) {
+
+					pm.pause();
+				}
 			} );
 
 	};
@@ -170,8 +198,8 @@ var playerManager = function ( video ) {
 
 	pm.shortKeys = [
         new ShortKey( 32, '[space]', 'playOnPress', 'hold', [
-            pm.play,
-			pm.pause
+            pm.playIndipendently,
+			pm.pauseIndipendently
         ] ),
         new ShortKey( 80, 'p', 'playToggle', 'down', pm.toggle ),
         new ShortKey( 77, 'm', 'marker', 'hold', [

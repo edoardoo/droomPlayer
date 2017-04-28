@@ -7,6 +7,7 @@ class Seeker {
 		this.seconds = 0;
 		this.width = 400;
 		this.container = container;
+		this._refresh = false;
 		this.init();
 		return;
 	}
@@ -59,7 +60,10 @@ class Seeker {
 			this.player.currentTime
 		);
 
-		if ( this.refresh ) {
+		// logger.debug( "Seeker", "state of refresh: " + this._refresh );
+
+
+		if ( this._refresh ) {
 
 			window.requestAnimationFrame( this.update.bind( this ) );
 
@@ -69,15 +73,15 @@ class Seeker {
 
 	startRefresh() {
 
-		logger.debug( 'Seeker', ' started refreshing seeker. ' );
-		this.refresh = true;
+		logger.debug( 'Seeker', ' started refreshing. ' );
+		this._refresh = true;
 		window.requestAnimationFrame( this.update.bind( this ) );
 	}
 
 	stopRefresh() {
 
-		logger.debug( 'Seeker', ' stopped refreshing seeker. ' );
-		this.refresh = false;
+		logger.debug( 'Seeker', ' stopped refreshing. ' );
+		this._refresh = false;
 
 	}
 
